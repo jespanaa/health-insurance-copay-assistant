@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estimador de Copago y Cobertura | Hackathon MVP</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="glow-container">
+        <div class="glow-sphere sphere-1"></div>
+        <div class="glow-sphere sphere-2"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="fa-solid fa-user-nurse brand-icon"></i>
+                <div class="brand-name">
+                    <h1>Copay<span>Assistant</span></h1>
+                    <p>Estimador Agéntico de Copago y Cobertura</p>
+                </div>
+            </div>
+            <div class="system-status">
+                <span class="status-dot"></span>
+                <span>Servicio Activo (Red de Ecuador)</span>
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <main class="app-grid">
+            
+            <!-- Left Column: Forms & Validation -->
+            <section class="controls-section">
+                
+                <!-- Card 1: User Validation -->
+                <div class="glass-card" id="validation-card">
+                    <div class="card-header">
+                        <span class="step-badge">Paso 1</span>
+                        <h2><i class="fa-solid fa-id-card"></i> Validación de Asegurado</h2>
+                    </div>
+                    <p class="card-subtitle">Ingresa tu número de identificación y póliza para iniciar.</p>
+                    
+                    <form id="login-form">
+                        <div class="input-group">
+                            <label for="national-id">Identificación (Cédula)</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-fingerprint input-icon"></i>
+                                <input type="text" id="national-id" placeholder="Ej. 1712345678" required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="policy-number">Número de Póliza</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-file-contract input-icon"></i>
+                                <input type="text" id="policy-number" placeholder="Ej. POL-PLATINUM-001" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <span class="btn-text">Verificar Póliza</span>
+                            <i class="fa-solid fa-shield-halved btn-icon"></i>
+                        </button>
+                    </form>
+
+                    <!-- Validated User Profile (Hidden initially) -->
+                    <div id="user-profile" class="hidden">
+                        <div class="profile-details">
+                            <div class="avatar">
+                                <i class="fa-solid fa-user-check"></i>
+                            </div>
+                            <div class="profile-info">
+                                <h3 id="profile-name">Juan Noboa</h3>
+                                <p id="profile-plan"><i class="fa-solid fa-crown text-gold"></i> Plan Platino Seguro</p>
+                            </div>
+                        </div>
+                        <button id="btn-logout" class="btn btn-secondary btn-sm">
+                            <i class="fa-solid fa-right-from-bracket"></i> Cambiar de Asegurado
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2: Symptom & City Selector -->
+                <div class="glass-card locked" id="estimator-card">
+                    <div class="lock-overlay" id="estimator-lock-overlay">
+                        <div class="lock-message">
+                            <i class="fa-solid fa-lock"></i>
+                            <p>Complete el Paso 1 para habilitar el estimador de copagos.</p>
+                        </div>
+                    </div>
+
+                    <div class="card-header">
+                        <span class="step-badge">Paso 2</span>
+                        <h2><i class="fa-solid fa-heart-pulse"></i> Consulta Médica</h2>
+                    </div>
+                    <p class="card-subtitle">Describe tus síntomas y selecciona la ciudad para cotizar la atención.</p>
+
+                    <!-- Standard Form -->
+                    <form id="estimator-form">
+                        <div class="input-group">
+                            <label for="city-selector">Ciudad de Atención</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-location-dot input-icon"></i>
+                                <select id="city-selector" required>
+                                    <option value="" disabled selected>Selecciona tu ciudad...</option>
+                                    <!-- Options populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="symptom-text">¿Qué síntomas presentas?</label>
+                            <p class="input-hint">Ej: "Tengo un dolor muy fuerte en el pecho que se extiende al brazo" o "Mi hijo de 5 años tiene fiebre y tos seca".</p>
+                            <div class="input-wrapper">
+                                <textarea id="symptom-text" rows="4" placeholder="Describe tus síntomas detalladamente aquí..." required></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-accent btn-block" id="btn-estimate">
+                            <span class="btn-text">Calcular Cobertura</span>
+                            <i class="fa-solid fa-wand-magic-sparkles btn-icon"></i>
+                        </button>
+                    </form>
+
+                    <!-- Clarification UI (Hidden initially) -->
+                    <div id="clarification-container" class="hidden">
+                        <div class="clarification-chat-box">
+                            <div class="chat-header">
+                                <i class="fa-solid fa-comment-medical text-cyan"></i>
+                                <span>Aclaración Requerida</span>
+                            </div>
+                            <p id="clarification-prompt-text">¿Podrías detallar qué parte del cuerpo te duele o qué otros síntomas presentas?</p>
+                            <div class="input-group">
+                                <input type="text" id="clarification-answer" placeholder="Escribe tu respuesta aquí..." required>
+                            </div>
+                            <div class="chat-actions">
+                                <button id="btn-submit-clarification" class="btn btn-cyan btn-sm">Enviar Aclaración</button>
+                                <button id="btn-cancel-clarification" class="btn btn-secondary btn-sm">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: Results & History -->
+            <section class="results-section">
+                <!-- Emergency Banner (Hidden initially) -->
+                <div class="emergency-banner hidden" id="emergency-alert">
+                    <div class="emergency-icon-container">
+                        <i class="fa-solid fa-triangle-exclamation pulse-icon"></i>
+                    </div>
+                    <div class="emergency-content">
+                        <h3>⚠️ Alerta de Emergencia Médica</h3>
+                        <p>Los síntomas ingresados sugieren una posible emergencia de gravedad. Le aconsejamos acudir inmediatamente a la sala de emergencias más cercana o comunicarse con el 911 de inmediato. Evite la automedicación.</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Results Panel -->
+                <div class="glass-card" id="results-card">
+                    <div class="results-placeholder" id="results-placeholder">
+                        <i class="fa-solid fa-chart-line placeholder-icon"></i>
+                        <h3>Listo para estimar</h3>
+                        <p>Complete y envíe el formulario de consulta médica para ver el análisis de especialidad, los copagos y la lista de hospitales recomendados.</p>
+                    </div>
+
+                    <!-- Live Results Content (Hidden initially) -->
+                    <div id="results-content" class="hidden">
+                        <div class="card-header">
+                            <h2><i class="fa-solid fa-receipt"></i> Estimación de Copago y Cobertura</h2>
+                        </div>
+                        
+                        <!-- Top Summary Widgets -->
+                        <div class="results-widgets">
+                            <div class="widget">
+                                <span class="widget-label">Especialidad Recomendada</span>
+                                <span class="widget-value" id="res-specialty">Cardiología</span>
+                                <div class="confidence-container">
+                                    <span class="confidence-label">Confianza del Análisis:</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="res-confidence-bar" style="width: 85%;"></div>
+                                    </div>
+                                    <span class="confidence-value" id="res-confidence-text">85%</span>
+                                </div>
+                            </div>
+                            <div class="widget highlight">
+                                <span class="widget-label">Copago Estimado</span>
+                                <span class="widget-value highlight-text" id="res-copay">$20.00</span>
+                                <span class="widget-subtext" id="res-coverage">Plan cubre el 90%</span>
+                            </div>
+                        </div>
+
+                        <!-- AI Explanation -->
+                        <div class="explanation-box">
+                            <h4><i class="fa-solid fa-brain text-cyan"></i> Criterio del Asistente Agéntico</h4>
+                            <p id="res-explanation">Se sugiere la especialidad de Cardiología debido a la mención de síntomas relacionados con dolor de pecho...</p>
+                        </div>
+
+                        <!-- Hospital Rankings -->
+                        <div class="hospitals-section">
+                            <div class="section-title">
+                                <h3><i class="fa-solid fa-hospital"></i> Hospitales Recomendados en <span id="res-city" class="text-cyan">Quito</span></h3>
+                                <span class="badge badge-success">Mejor costo primero</span>
+                            </div>
+
+                            <div class="hospitals-list" id="res-hospitals-list">
+                                <!-- Populated dynamically with hospital cards -->
+                            </div>
+                        </div>
+
+                        <!-- Sticky Disclaimer -->
+                        <div class="disclaimer-box">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span id="res-disclaimer">Estimación informativa preliminar, no constituye una autorización de cobertura ni costo final por parte de la aseguradora.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: History Panel -->
+                <div class="glass-card" id="history-card">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-clock-rotate-left"></i> Historial Reciente</h2>
+                        <button id="btn-clear-history" class="btn btn-secondary btn-xs"><i class="fa-solid fa-trash-can"></i> Limpiar</button>
+                    </div>
+                    <div class="history-list" id="history-list">
+                        <p class="history-placeholder">No hay consultas recientes.</p>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2026 CopayAssistant MVP. Diseñado para el Desafío "Estimador Agéntico de Copago y Cobertura".</p>
+        </footer>
+    </div>
+
+    <!-- Application Logic -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
